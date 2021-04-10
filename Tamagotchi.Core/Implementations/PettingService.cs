@@ -1,5 +1,4 @@
-using System;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Tamagotchi.Core.Configuration;
 using Tamagotchi.Core.Interfaces;
 
@@ -10,7 +9,7 @@ namespace Tamagotchi.Core.Implementations
         private readonly ISatisfactionService _satisfactionService;
         private readonly PettingOptions _options;
 
-        public PettingService(ISatisfactionService satisfactionService, 
+        public PettingService(ISatisfactionService satisfactionService,
             IOptions<PettingOptions> pettingOptions)
         {
             _satisfactionService = satisfactionService;
@@ -19,14 +18,18 @@ namespace Tamagotchi.Core.Implementations
 
         public TType Perform<TType>(TType tamagotchi) where TType : Models.Tamagotchi
         {
-            tamagotchi.Happiness = _satisfactionService.Perform(tamagotchi.Happiness, _options.MoodChangeEvery);
-            return tamagotchi;
+            return tamagotchi with
+            {
+                Happiness = _satisfactionService.Perform(tamagotchi.Happiness, _options.MoodChangeEvery)
+            };
         }
 
         public TType Check<TType>(TType tamagotchi) where TType : Models.Tamagotchi
         {
-            tamagotchi.Happiness = _satisfactionService.Check(tamagotchi.Happiness, _options.MoodChangeEvery);
-            return tamagotchi;
+            return tamagotchi with
+            {
+                Happiness = _satisfactionService.Check(tamagotchi.Happiness, _options.MoodChangeEvery)
+            };
         }
     }
 }
