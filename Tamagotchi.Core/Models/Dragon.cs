@@ -1,13 +1,17 @@
-using System;
+﻿using System;
 using Tamagotchi.Core.Configuration;
-using Tamagotchi.Core.Enums;
 using Tamagotchi.Core.Implementations.Dragon;
 
 namespace Tamagotchi.Core.Models
 {
-    public record Dragon : Tamagotchi
-    {
-        public DragonLifeStage LifeStage { get; set; }
-        public DragonAgeingOptions AgeingOptions { get; set; }
-    }
+    public record Dragon(
+        DragonLifeStage LifeStage,
+        DragonAgeingOptions AgeingOptions,
+        string Name,
+        int Age,
+        int Weight,
+        DateTime Hatched,
+        ActionStatus Hunger,
+        ActionStatus Happiness
+        ) : Tamagotchi(Name, Age, Weight, Hatched, Hunger, Happiness);
 }

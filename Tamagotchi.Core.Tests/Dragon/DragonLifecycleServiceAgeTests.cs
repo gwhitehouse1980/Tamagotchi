@@ -1,9 +1,8 @@
-using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using System;
 using Tamagotchi.Core.Configuration;
-using Tamagotchi.Core.Enums;
 using Tamagotchi.Core.Implementations;
 using Tamagotchi.Core.Implementations.Dragon;
 using Tamagotchi.Core.Interfaces;
@@ -27,7 +26,7 @@ namespace Tamagotchi.Core.Tests.Dragon
         private readonly int _elapsedTime;
         private readonly DragonLifeStage _expectedStage;
 
-        public DragonLifecycleServiceAgeTests(int childAfter, int teenAfter, int adultAfter, int deadAfter, 
+        public DragonLifecycleServiceAgeTests(int childAfter, int teenAfter, int adultAfter, int deadAfter,
             int elapsedTime, DragonLifeStage expectedStage)
         {
             _childAfter = childAfter;
@@ -45,18 +44,12 @@ namespace Tamagotchi.Core.Tests.Dragon
             var current = DateTime.Now;
             var compareWith = current.AddSeconds(_elapsedTime);
 
-            var myDragon = Common.HatchDragon(name, current, new DragonAgeingOptions()
-            {
-                AdultAfter = _adultAfter,
-                ChildAfter = _childAfter,
-                DeadAfter = _deadAfter,
-                TeenAfter = _teenAfter
-            });
-            
+            var myDragon = Common.HatchDragon(name, current, new DragonAgeingOptions(_childAfter, _teenAfter, _adultAfter, _deadAfter));
+
             var mockTime = new Mock<ITimeService>();
             mockTime.Setup(x => x.GetCurrentTime()).Returns(compareWith);
             var elapsedService = new ElapsedService(mockTime.Object);
-            
+
             var lifecycleService = new LifecycleService(elapsedService, mockTime.Object);
 
             myDragon = lifecycleService.Age(myDragon);

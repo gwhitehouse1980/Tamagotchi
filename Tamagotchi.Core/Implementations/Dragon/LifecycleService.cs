@@ -1,5 +1,4 @@
-using System;
-using Microsoft.Extensions.Options;
+﻿using System;
 using Tamagotchi.Core.Configuration;
 using Tamagotchi.Core.Enums;
 using Tamagotchi.Core.Interfaces;
@@ -17,7 +16,7 @@ namespace Tamagotchi.Core.Implementations.Dragon
             _elapsedService = elapsedService;
             _timeService = timeService;
         }
-        
+
         public Models.Dragon Hatch(string name, DragonAgeingOptions ageingOptions)
         {
             // Only input here is name
@@ -25,43 +24,49 @@ namespace Tamagotchi.Core.Implementations.Dragon
             {
                 throw new ArgumentException("Parameter name must contain a value", nameof(name));
             }
-            
-            return new()
-            {
-                Name = name,
-                Age = 0,
-                Weight = 10,
-                AgeingOptions = ageingOptions,
-                Happiness = new ActionStatus
-                {
-                    SatisfactionLevel = SatisfactionLevel.Neutral,
-                    LastAction = _timeService.GetCurrentTime(),
-                    LastChecked = _timeService.GetCurrentTime()
-                },
-                Hunger = new ActionStatus
-                {
-                    SatisfactionLevel = SatisfactionLevel.Neutral,
-                    LastAction = _timeService.GetCurrentTime(),
-                    LastChecked = _timeService.GetCurrentTime()
-                },
-                Hatched = _timeService.GetCurrentTime(),
-                LifeStage = DragonLifeStage.Baby
-            };
+
+            return new Models.Dragon(
+                DragonLifeStage.Baby,
+                ageingOptions,
+                name,
+                0,
+                10,
+                 _timeService.GetCurrentTime(),
+                  new ActionStatus
+                  {
+                      SatisfactionLevel = SatisfactionLevel.Neutral,
+                      LastAction = _timeService.GetCurrentTime(),
+                      LastChecked = _timeService.GetCurrentTime()
+                  },
+               new ActionStatus
+               {
+                   SatisfactionLevel = SatisfactionLevel.Neutral,
+                   LastAction = _timeService.GetCurrentTime(),
+                   LastChecked = _timeService.GetCurrentTime()
+               });
         }
 
         public Models.Dragon Age(Models.Dragon tamagotchi)
         {
-            // Update dragons age
-            tamagotchi.Age = (int)_elapsedService.GetElapsedTime(tamagotchi.Hatched).TotalSeconds;
-            
-            // Check status
-            if (tamagotchi.Age > tamagotchi.AgeingOptions.DeadAfter) tamagotchi.LifeStage = DragonLifeStage.Dead;
-            else if (tamagotchi.Age > tamagotchi.AgeingOptions.AdultAfter) tamagotchi.LifeStage = DragonLifeStage.Adult;
-            else if (tamagotchi.Age > tamagotchi.AgeingOptions.TeenAfter) tamagotchi.LifeStage = DragonLifeStage.Teen;
-            else if (tamagotchi.Age > tamagotchi.AgeingOptions.ChildAfter) tamagotchi.LifeStage = DragonLifeStage.Child;
-            else tamagotchi.LifeStage = DragonLifeStage.Baby;
+            return tamagotchi with
+            {
+                Age = (int)_elapsedService.GetElapsedTime(tamagotchi.Hatched).TotalSeconds,
+                LifeStage = Update(tamagotchi.Age, tamagotchi.AgeingOptions)
+            };
+        }
 
-            return tamagotchi;
+        private DragonLifeStage Update(int age, DragonAgeingOptions ageingOptions)
+        {
+            if (age > ageingOptions.DeadAfter)
+                return DragonLifeStage.Dead;
+            else if (age > ageingOptions.AdultAfter)
+                return DragonLifeStage.Adult;
+            else if (age > ageingOptions.TeenAfter)
+                return DragonLifeStage.Teen;
+            else if (age > ageingOptions.ChildAfter)
+                return DragonLifeStage.Child;
+            else
+                return DragonLifeStage.Baby;
         }
     }
 }

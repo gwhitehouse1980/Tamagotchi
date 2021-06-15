@@ -1,5 +1,4 @@
-using System;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Tamagotchi.Core.Configuration;
 using Tamagotchi.Core.Interfaces;
 
@@ -10,7 +9,7 @@ namespace Tamagotchi.Core.Implementations
         private readonly ISatisfactionService _satisfactionService;
         private readonly FeedingOptions _options;
 
-        public FeedingService(ISatisfactionService satisfactionService, 
+        public FeedingService(ISatisfactionService satisfactionService,
             IOptions<FeedingOptions> feedingOptions)
         {
             _satisfactionService = satisfactionService;
@@ -19,14 +18,18 @@ namespace Tamagotchi.Core.Implementations
 
         public TType Perform<TType>(TType tamagotchi) where TType : Models.Tamagotchi
         {
-            tamagotchi.Hunger = _satisfactionService.Perform(tamagotchi.Hunger, _options.HungerChangeEvery);
-            return tamagotchi;
+            return tamagotchi with
+            {
+                Hunger = _satisfactionService.Perform(tamagotchi.Hunger, _options.HungerChangeEvery)
+            };
         }
 
         public TType Check<TType>(TType tamagotchi) where TType : Models.Tamagotchi
         {
-            tamagotchi.Hunger = _satisfactionService.Check(tamagotchi.Hunger, _options.HungerChangeEvery);
-            return tamagotchi;
+            return tamagotchi with
+            {
+                Hunger = _satisfactionService.Check(tamagotchi.Hunger, _options.HungerChangeEvery)
+            };
         }
     }
 }
